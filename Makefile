@@ -1,7 +1,7 @@
 PYTHON := python
 pcm    := $(PYTHON) tools/pokemontools/pcm.py pcm
 
-rom := pokeyellow.gbc
+rom := pokefrigo.gbc
 
 objs := audio.o main.o text.o wram.o
 
@@ -58,10 +58,10 @@ endif
 $(objs): %.o: %.asm $$(dep)
 	$(RGBASM) -h -o $@ $*.asm
 
-opts = -cjsv -k 01 -l 0x33 -m 0x1b -p 0 -r 03 -t "POKEMON YELLOW"
+opts = -cjsv -k 01 -l 0x33 -m 0x1b -p 0 -r 03 -t "POKEMON FRIGO"
 
 $(rom): $(objs)
-	$(RGBLINK) -n pokeyellow.sym -l pokeyellow.link -o $@ $^
+	$(RGBLINK) -n pokefrigo.sym -l pokefrigo.link -o $@ $^
 	$(RGBFIX) $(opts) $@
 	sort $(rom:.gbc=.sym) -o $(rom:.gbc=.sym)
 
