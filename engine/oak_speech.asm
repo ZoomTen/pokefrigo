@@ -42,10 +42,8 @@ SetDefaultNames:
 
 OakSpeech:
 	call StopAllMusic ; stop music
-	ld a, BANK(Music_Routes2)
-	ld c, a
-	ld a, MUSIC_ROUTES2
-	call PlayMusic
+	ld a, Mus_Routes2
+	call PlayMusicID
 	call ClearScreen
 	call LoadTextBoxTilePatterns
 	call SetDefaultNames
@@ -134,16 +132,6 @@ OakSpeech:
 	lb bc, BANK(ShrinkPic2), $00
 	call IntroDisplayPicCenteredOrUpperRight
 	call ResetPlayerSpriteData
-	ld a, [H_LOADEDROMBANK]
-	push af
-	ld a, BANK(Music_PalletTown)
-	ld [wAudioROMBank], a
-	ld [wAudioSavedROMBank], a
-	ld a, 10
-	ld [wAudioFadeOutControl], a
-	call StopAllMusic ; stop music
-	pop af
-	call BankswitchCommon
 	ld c, 20
 	call DelayFrames
 	coord hl, 6, 5

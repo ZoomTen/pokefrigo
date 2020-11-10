@@ -132,7 +132,7 @@ DisplayTitleScreen:
 	call LoadScreenTilesFromBuffer1
 	ld c, 36
 	call DelayFrames
-	ld a, SFX_INTRO_WHOOSH
+	ld a, $FF
 	call PlaySound
 
 ; scroll game version in from the right
@@ -144,9 +144,8 @@ DisplayTitleScreen:
 	call TitleScreen_PlayPikachuPCM
 	call WaitForSoundToFinish
 	call StopAllMusic
-	ld a, MUSIC_TITLE_SCREEN
-	ld [wNewSoundID], a
-	call PlaySound
+	ld a, Mus_TitleScreen
+	call PlayMusicID
 .loop
 	xor a
 	ld [wUnusedCC5B], a

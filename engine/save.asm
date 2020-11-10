@@ -1,3 +1,5 @@
+SECTION "LoadSav", ROMX
+
 LoadSAV:
 ;(if carry -> write
 ;"the file data is destroyed")

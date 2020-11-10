@@ -575,6 +575,10 @@ LoadSGB:
 	ld hl, SuperPalettes
 	call CopyGfxToSuperNintendoVRAM
 	call ClearVram
+	ld de, Packets_bootstrap
+	call TransferMultiplePackets
+	ld hl, JumpToMSU1EntryPoint
+	call SendSGBPacket
 	ld hl, MaskEnCancelPacket
 	jp SendSGBPacket
 
@@ -1106,6 +1110,77 @@ CopySGBBorderTiles:
 	dec b
 	jr nz, .tileLoop
 	ret
+
+
+Trn_FreezeSGBScreen:
+	di
+	ld hl, MaskEnFreezePacket
+	call SendSGBPacket
+	reti
+
+Trn_UnfreezeSGBScreen:
+	di
+	ld hl, MaskEnCancelPacket
+	call SendSGBPacket
+	reti
+
+Trn_DuckMusic::
+	di
+	ld a, [wOnSGB]
+	and a
+	jr nz, .sgb
+	call SGBorGBC
+	jr nc, .sgb
+	reti
+	ret
+.sgb
+	ld hl, DuckMusicPacket
+	call SendSGBPacket
+	ld hl, UpdateVolumePacket
+	call SendSGBPacket
+	reti
+
+Trn_UnduckMusic::
+	di
+	ld a, [wOnSGB]
+	and a
+	jr nz, .sgb
+	call SGBorGBC
+	jr nc, .sgb
+	reti
+.sgb
+	ld hl, UnduckMusicPacket
+	call SendSGBPacket
+	ld hl, UpdateVolumePacket
+	call SendSGBPacket
+	reti
+
+
+TransferPacket::
+	; de = pointer to the transfer data
+	;      this has to be one in the same bank
+	;      this function is located in or WRAM :upside_down:
+	di
+	ld h, d
+	ld l, e		; hl -> de
+	call SendSGBPacket
+	reti
+
+TransferMultiplePackets:
+	; de = pointer to the transfer data
+	;      this has to be one in the same bank
+	;      this function is located in or WRAM :upside_down:
+	di
+	ld a, [de]	; number of packets to transfer
+	inc de
+	ld h, d
+	ld l, e		; hl -> de
+	ld c, a		; hopefully this is free
+.transfer
+	call SendSGBPacket
+	dec c
+	jr nz, .transfer
+	reti
 
 INCLUDE "data/sgb_packets.asm"
 

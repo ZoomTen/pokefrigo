@@ -301,16 +301,6 @@ DrawHPBar::
 LoadMonData::
 	jpab LoadMonData_
 
-OverwritewMoves::
-; Write c to [wMoves + b]. Unused.
-	ld hl, wMoves
-	ld e, b
-	ld d, 0
-	add hl, de
-	ld a, c
-	ld [hl], a
-	ret
-
 LoadFlippedFrontSpriteByMonIndex::
 	ld a, 1
 	ld [wSpriteFlipped], a
@@ -605,15 +595,6 @@ PrintLevelCommon::
 	ld de, wd11e
 	ld b, LEFT_ALIGN | 1 ; 1 byte
 	jp PrintNumber
-
-GetwMoves::
-; Unused. Returns the move at index a from wMoves in a
-	ld hl, wMoves
-	ld c, a
-	ld b, 0
-	add hl, bc
-	ld a, [hl]
-	ret
 
 ; copies the base stat data of a pokemon to wMonHeader
 ; INPUT:
@@ -1104,7 +1085,6 @@ FadeOutAudio::
 	ld b, a
 	xor a
 	ld [wAudioFadeOutControl], a
-	call StopAllMusic
 	ld a, [wAudioSavedROMBank]
 	ld [wAudioROMBank], a
 	ld a, b
@@ -2599,7 +2579,6 @@ SpritePositionBankswitch::
 
 CheckForEngagingTrainers::
 	xor a
-	call ReadTrainerHeaderInfo       ; read trainer flag's bit (unused)
 	ld d, h                          ; store trainer header address in de
 	ld e, l
 .trainerLoop
@@ -3206,13 +3185,6 @@ YesNoChoicePokeCenter::
 	lb bc, 8, 12
 	jr DisplayYesNoChoice
 
-WideYesNoChoice:: ; unused
-	call SaveScreenTilesToBuffer1
-	ld a, WIDE_YES_NO_MENU
-	ld [wTwoOptionMenuID], a
-	coord hl, 12, 7
-	lb bc, 8, 13
-
 DisplayYesNoChoice::
 	ld a, TWO_OPTION_MENU
 	ld [wTextBoxID], a
@@ -3416,7 +3388,7 @@ WaitForSoundToFinish::
 NamePointers::
 	dw MonsterNames
 	dw MoveNames
-	dw UnusedNames
+	dw 0
 	dw ItemNames
 	dw wPartyMonOT ; player's OT names list
 	dw wEnemyMonOT ; enemy's OT names list
@@ -3494,10 +3466,6 @@ GetName::
 	ld bc, $0014
 	call CopyData
 .gotPtr
-	ld a, e
-	ld [wUnusedCF8D], a
-	ld a, d
-	ld [wUnusedCF8D + 1], a
 	pop de
 	pop bc
 	pop hl

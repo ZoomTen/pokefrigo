@@ -172,6 +172,7 @@ ROMX $1C
 ROMX $1D
 	org $4000
 	"bank1D"
+	"LoadSav"
 
 ROMX $1E
 	org $4000

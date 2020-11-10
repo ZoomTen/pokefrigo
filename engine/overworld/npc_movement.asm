@@ -79,10 +79,8 @@ PalletMovementScript_OakMoveLeft:
 	ld a, $3
 	ld [wNPCMovementScriptFunctionNum], a
 .done
-	ld a, BANK(Music_MuseumGuy)
-	ld c, a
-	ld a, MUSIC_MUSEUM_GUY
-	call PlayMusic
+	ld a, Mus_FollowMe
+	call PlayMusicID
 	ld hl, wFlags_D733
 	set 1, [hl]
 	ld a, $fc
@@ -167,10 +165,8 @@ PewterMuseumGuyMovementScriptPointerTable:
 	dw PewterMovementScript_Done
 
 PewterMovementScript_WalkToMuseum:
-	ld a, BANK(Music_MuseumGuy)
-	ld c, a
-	ld a, MUSIC_MUSEUM_GUY
-	call PlayMusic
+	ld a, Mus_FollowMe
+	call PlayMusicID
 	ld a, [wSpriteIndex]
 	swap a
 	ld [wNPCMovementScriptSpriteOffset], a
@@ -221,10 +217,8 @@ PewterGymGuyMovementScriptPointerTable:
 	dw PewterMovementScript_Done
 
 PewterMovementScript_WalkToGym:
-	ld a, BANK(Music_MuseumGuy)
-	ld c, a
-	ld a, MUSIC_MUSEUM_GUY
-	call PlayMusic
+	ld a, Mus_FollowMe
+	call PlayMusicID
 	ld a, [wSpriteIndex]
 	swap a
 	ld [wNPCMovementScriptSpriteOffset], a

@@ -26,7 +26,7 @@ RGBLINK ?= $(RGBDS)rgblink
 .PHONY: all yellow clean tidy compare tools snes_code
 
 all: $(rom)
-yellow: $(rom)
+yellow: snes_code $(rom)
 
 snes_code:
 	$(MAKE) -C audio/msu1/
@@ -43,6 +43,7 @@ clean:
 tidy:
 	rm -f $(rom) $(objs) $(rom:.gbc=.sym)
 	$(MAKE) clean -C tools/
+	$(MAKE) clean -C audio/msu1/
 
 tools:
 	$(MAKE) -C tools/
