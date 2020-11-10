@@ -23,10 +23,13 @@ RGBLINK ?= $(RGBDS)rgblink
 .SECONDEXPANSION:
 .PRECIOUS:
 .SECONDARY:
-.PHONY: all yellow clean tidy compare tools
+.PHONY: all yellow clean tidy compare tools snes_code
 
 all: $(rom)
 yellow: $(rom)
+
+snes_code:
+	$(MAKE) -C audio/msu1/
 
 # For contributors to make sure a change didn't affect the contents of the rom.
 compare: $(rom)

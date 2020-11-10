@@ -464,7 +464,6 @@ WarpFound2::
 	ld a, [wCurMap]
 	ld [wLastMap], a
 	ld a, [wCurMapWidth]
-	ld [wUnusedD366], a ; not read
 	ld a, [hWarpDestinationMap]
 	ld [wCurMap], a
 	cp ROCK_TUNNEL_1F
@@ -739,8 +738,6 @@ HandleBlackOut::
 ; Does not print the "blacked out" message.
 
 	call GBFadeOutToBlack
-	ld a, $08
-	call StopMusic
 	ld hl, wd72e
 	res 5, [hl]
 	switchbank SpecialWarpIn ; also Bank(SpecialEnterMap)
@@ -750,13 +747,31 @@ HandleBlackOut::
 	jp SpecialEnterMap
 
 StopMusic::
-	ld [wAudioFadeOutControl], a
-	call StopAllMusic
-.wait
-	ld a, [wAudioFadeOutControl]
+	ld a, [wOnSGB]
 	and a
-	jr nz, .wait
-	jp StopAllSounds
+	jr nz, .sgb
+	ld a, $FF
+	ld [wNewSoundID], a
+	ld a, %00000100
+	ld [wAudioFadeOutControl], a
+	ret
+.sgb
+; copy packet template
+	ld bc, 16
+	ld a, BANK(MSU1SoundTemplate)
+	ld hl, MSU1SoundTemplate
+	ld de, wMSU1PacketSend
+	call FarCopyData
+; modify packet template
+	ld a, %00000010
+	ld [wMSU1PacketSend+5], a	; ask for a fade out
+	call StopAllMusic
+; send it over!
+	ld a, BANK(TransferPacket)
+	ld de,wMSU1PacketSend
+	call BankswitchHome
+	call TransferPacket
+	jp BankswitchBack
 
 HandleFlyWarpOrDungeonWarp::
 	call UpdateSprites
@@ -1826,7 +1841,6 @@ Func_0db5:: ; XXX
 	callba LoadUnusedBluesHouseMissableObjectData
 asm_0dbd
 	ld a, [wCurMapTileset]
-	ld [wUnusedD119], a
 	ld a, [wCurMap]
 	call SwitchToMapRomBank
 	ld a, [wCurMapTileset]
@@ -1936,14 +1950,11 @@ asm_0dbd
 	ld b, $00
 	ld a, [H_LOADEDROMBANK]
 	push af
-	switchbank MapSongBanks
-	ld hl, MapSongBanks
-	add hl, bc
+	switchbank MapSongIDs
+	ld hl, MapSongIDs
 	add hl, bc
 	ld a, [hli]
 	ld [wMapMusicSoundID], a ; music 1
-	ld a, [hl]
-	ld [wMapMusicROMBank], a ; music 2
 	pop af
 	call BankswitchCommon
 	ret
@@ -2053,7 +2064,6 @@ ResetMapVariables::
 	ld [hSCY], a
 	ld [hSCX], a
 	ld [wWalkCounter], a
-	ld [wUnusedD119], a
 	ld [wSpriteSetID], a
 	ld [wWalkBikeSurfStateCopy], a
 	ret

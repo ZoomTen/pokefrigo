@@ -41,9 +41,8 @@ VermilionDock_1db9b:
 	ld a, $ff
 	ld [wJoyIgnore], a
 	call StopAllMusic
-	ld c, BANK(Music_Surfing)
-	ld a, MUSIC_SURFING
-	call PlayMusic
+	ld a, Mus_Surfing
+	call PlayMusicID
 	callba LoadSmokeTileFourTimes
 	xor a
 	ld [wSpriteStateData1 + 2], a

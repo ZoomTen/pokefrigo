@@ -451,7 +451,7 @@ PlayBattleMusic::
 	ld a, [wGymLeaderNo]
 	and a
 	jr z, .notGymLeaderBattle
-	ld a, MUSIC_GYM_LEADER_BATTLE
+	ld a, Mus_GymLeaderBattle
 	jr .playSong
 .notGymLeaderBattle
 	ld a, [wCurOpponent]
@@ -461,76 +461,21 @@ PlayBattleMusic::
 	jr z, .finalBattle
 	cp OPP_LANCE
 	jr nz, .normalTrainerBattle
-	ld a, MUSIC_GYM_LEADER_BATTLE ; lance also plays gym leader theme
+	ld a, Mus_GymLeaderBattle ; lance also plays gym leader theme
 	jr .playSong
 .normalTrainerBattle
-	ld a, MUSIC_TRAINER_BATTLE
+	ld a, Mus_ChampionBattle
 	jr .playSong
 .finalBattle
 	ld a, MUSIC_FINAL_BATTLE
 	jr .playSong
 .wildBattle
-	ld a, MUSIC_WILD_BATTLE
+	ld a, Mus_WildBattle
 .playSong
-	jp PlayMusic
+	jp PlayMusicID
 
 
 INCLUDE "audio/engine_1.asm"
-
-
-; an alternate start for MeetRival which has a different first measure
-Music_RivalAlternateStart::
-	ld c, BANK(Music_MeetRival)
-	ld a, MUSIC_MEET_RIVAL
-	call PlayMusic
-	ld hl, wChannelCommandPointers
-	ld de, Music_MeetRival_branch_b1a2
-	call Audio1_OverwriteChannelPointer
-	ld de, Music_MeetRival_branch_b21d
-	call Audio1_OverwriteChannelPointer
-	ld de, Music_MeetRival_branch_b2b5
-
-Audio1_OverwriteChannelPointer:
-	ld a, e
-	ld [hli], a
-	ld a, d
-	ld [hli], a
-	ret
-
-; an alternate tempo for MeetRival which is slightly slower
-Music_RivalAlternateTempo::
-	ld c, BANK(Music_MeetRival)
-	ld a, MUSIC_MEET_RIVAL
-	call PlayMusic
-	ld de, Music_MeetRival_branch_b119
-	jr asm_99ed
-
-; applies both the alternate start and alternate tempo
-Music_RivalAlternateStartAndTempo::
-	call Music_RivalAlternateStart
-	ld de, Music_MeetRival_branch_b19b
-asm_99ed:
-	ld hl, wChannelCommandPointers
-	jp Audio1_OverwriteChannelPointer
-
-; XXX
-	ret
-
-; an alternate tempo for Cities1 which is used for the Hall of Fame room
-Music_Cities1AlternateTempo::
-	ld a, 10
-	ld [wAudioFadeOutCounterReloadValue], a
-	ld [wAudioFadeOutCounter], a
-	ld a, $ff ; stop playing music after the fade-out is finished
-	ld [wAudioFadeOutControl], a
-	ld c, 100
-	call DelayFrames ; wait for the fade-out to finish
-	ld c, BANK(Music_Cities1)
-	ld a, MUSIC_CITIES1
-	call PlayMusic
-	ld hl, wChannelCommandPointers
-	ld de, Music_Cities1_branch_aa6f
-	jp Audio1_OverwriteChannelPointer
 
 
 SECTION "Audio Engine 2", ROMX ; BANK $08
@@ -558,8 +503,12 @@ Music_DoLowHealthAlarm::
 	call .playToneLo  ;actually set the sound registers.
 
 .asm_2138a
+	ld a, [wOnSGB]
+	and a
+	jr nz, .continue_0		; skip if on SGB
 	ld a, $86
-	ld [wChannelSoundIDs + Ch5], a ;disable sound channel?
+	ld [wChannelSoundIDs + Ch4], a ;disable sound channel?
+.continue_0
 	ld a, [wLowHealthAlarm]
 	and $7f ;decrement alarm timer.
 	dec a
@@ -573,6 +522,7 @@ Music_DoLowHealthAlarm::
 .disableAlarm
 	xor a
 	ld [wLowHealthAlarm], a  ;disable alarm
+	ld [wChannelSoundIDs + Ch4], a  ;re-enable sound channel?
 	ld [wChannelSoundIDs + Ch5], a  ;re-enable sound channel?
 	ld de, .toneDataSilence
 	jr .playTone
@@ -588,13 +538,20 @@ Music_DoLowHealthAlarm::
 
 ;update sound channel 1 to play the alarm, overriding all other sounds.
 .playTone
-	ld hl, rNR10 ;channel 1 sound register
-	ld c, $5
+	ld a, [wOnSGB]
+	and a
+	jr z, .notSGB
+	ld hl, rNR21 	; channel 2 sound register, so the select SFX can play
+	jr .continue
+.notSGB
+	ld hl, rNR10 	;channel 1 sound register
 	xor a
-
+	ld [hli], a	; always clear sweep
+.continue
+	ld c, $5
 .copyLoop
-	ld [hli], a
 	ld a, [de]
+	ld [hli], a
 	inc de
 	dec c
 	jr nz, .copyLoop
@@ -616,7 +573,6 @@ Music_DoLowHealthAlarm::
 INCLUDE "engine/menu/bills_pc.asm"
 
 INCLUDE "audio/engine_2.asm"
-
 
 SECTION "Audio Engine 3", ROMX ; BANK $1f
 

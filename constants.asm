@@ -31,3 +31,5 @@ INCLUDE "constants/starter_mons.asm"
 INCLUDE "constants/event_constants.asm"
 INCLUDE "constants/text_constants.asm"
 INCLUDE "constants/pikachu_emotion_constants.asm"
+
+INCLUDE "constants/music_id_constants.asm"

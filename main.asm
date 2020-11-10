@@ -65,7 +65,7 @@ INCLUDE "engine/menu/players_pc.asm"
 INCLUDE "engine/remove_pokemon.asm"
 
 INCLUDE "engine/display_pokedex.asm"
-
+INCLUDE "audio/play_music_id.asm"
 
 SECTION "bank3", ROMX
 

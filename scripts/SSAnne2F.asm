@@ -25,9 +25,10 @@ SSAnne2Script0:
 	call ArePlayerCoordsInArray
 	ret nc
 	call StopAllMusic
-	ld c, BANK(Music_MeetRival)
-	ld a, MUSIC_MEET_RIVAL
-	call PlayMusic
+	xor a
+	ld [wCheckAndFadeMusicID], a	; prevent fading in
+	ld a, Mus_MeetRival
+	call PlayMusicID
 	ld a, [wCoordIndex]
 	ld [$ffdb], a
 	ld a, HS_SS_ANNE_2F_RIVAL
@@ -129,7 +130,10 @@ SSAnne2Script2:
 	ld [H_SPRITEINDEX], a
 	call MoveSprite
 	call StopAllMusic
-	callba Music_RivalAlternateStart
+	xor a
+	ld [wCheckAndFadeMusicID], a	; prevent fading in
+	ld a, Mus_MeetRival2
+	call PlayMusicID
 	ld a, $3
 	ld [wSSAnne2FCurScript], a
 	ret

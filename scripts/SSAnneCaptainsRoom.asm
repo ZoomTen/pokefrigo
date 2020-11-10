@@ -44,18 +44,12 @@ SSAnne7Text1:
 SSAnne7RubText:
 	TX_FAR _SSAnne7RubText
 	TX_ASM
-	ld a, [wAudioROMBank]
-	cp BANK(AudioEngine3)
-	ld [wAudioSavedROMBank], a
-	jr nz, .asm_61908
 	call StopAllMusic
 	ld a, BANK(Music_PkmnHealed)
 	ld [wAudioROMBank], a
-.asm_61908
 	ld a, MUSIC_PKMN_HEALED
 	ld [wNewSoundID], a
 	call PlaySound
-.asm_61910
 	ld a, [wChannelSoundIDs]
 	cp MUSIC_PKMN_HEALED
 	jr z, .asm_61910
