@@ -118,16 +118,31 @@ PlayShootingStar:
 	ld bc, GameFreakIntroEnd - GameFreakIntro
 	ld a, BANK(GameFreakIntro)
 	call FarCopyData
-
+	ld hl, MSU1LogoGFX
+	ld de, vChars1 + $300
+	ld bc, MSU1LogoGFXEnd - MSU1LogoGFX
+	ld a, BANK(MSU1LogoGFX)
+	call FarCopyData
 	call EnableLCD
 	ld hl, rLCDC
 	res 5, [hl]
 	set 3, [hl]
+
+	ld a, [hGBC]
+	cpl			; !GBC
+	ld b, a
+	ld a, [wOnSGB]
+	and b
+	call nz, MSU1_Intro	; when purely SGB is detected
+
+	coord hl, 0, 4
+	ld bc, 20 * 10
+	ld a, $7f
+	call FillMemory
+
 	ld c, 64
 	call DelayFrames
 	callba AnimateShootingStar
-	push af
-	pop af
 	jr c, .next ; skip the delay if the user interrupted the animation
 	ld c, 40
 	call DelayFrames
@@ -153,6 +168,32 @@ IntroDrawBlackBars:
 	jp IntroPlaceBlackTiles
 
 EmptyFunc4:
+	ret
+
+MSU1_Intro:
+	coord hl, 5, 7
+	ld a, $B0-1
+	ld b, 4
+.ou_loop
+	ld c, 10
+.inn_loop
+	inc a
+	ld [hli], a
+	dec c
+	jr nz, .inn_loop
+	dec b
+	jr z, .fin
+	ld de, 10
+	add hl, de
+	jr .ou_loop
+.fin
+	ld a, 1
+	ld [H_AUTOBGTRANSFERENABLED], a
+	ld c, 3 * 60	; 3 seconds
+.wait_for_user
+	call CheckForUserInterruption
+	ret c
+	jr nz, .wait_for_user
 	ret
 
 GameFreakIntro:

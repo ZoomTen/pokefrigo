@@ -125,6 +125,8 @@ PokedexTileGraphicsEnd:
 WorldMapTileGraphics:           INCBIN "gfx/town_map.2bpp"
 WorldMapTileGraphicsEnd:
 PlayerCharacterTitleGraphics:   INCBIN "gfx/player_title.2bpp"
+MSU1LogoGFX:          INCBIN "gfx/msu1_logo.2bpp"
+MSU1LogoGFXEnd:
 
 INCLUDE "engine/menu/status_screen.asm"
 INCLUDE "engine/menu/party_menu.asm"
